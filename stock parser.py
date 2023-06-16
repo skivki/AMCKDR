@@ -4,17 +4,36 @@
 import requests #Для создания запросов
 import csv #Для записи в .csv файл (Excel)
 import time
+from openpyxl import Workbook 
 
 API_KEY = "TSJXCZMP5G2G8KJZ" #Секретный ключ для доступа в базу данных
 TIME_TYPE = "Weekly" # Monthly/Weekly/Daily Указвает на временные рамки запроса
 # STOCK_NAME = "TSLA" # Наименование акции компаний не всегда соответвствуют названию компаний, которые распоряжаются этими акциями. Например: Tesla -> TLSA, Apple -> AAPL, IBM -> IBM. Наименования можно найти в интернете.
 # path = "D:/kooldo/tesla.csv" #Путь, куда будет происходить запись. Выгядеть должно примерно так: path = "C:/stock/apple.csv". Внимание нужно обратить на "/" - он именно прямой, а Windows по дефолту копирует обратный. Если "apple.csv" сущетсвовать не будет, то программа создаст его сама, а если будет, то перезапишет. Программа не рабоатет, когда файл, в который должна происходить запись, открыт. 
 
+def write_toExcel(stockInfo, companyInfo, path):
+    workbook =  Workbook()
+    sheet = workbook.active
+    sheet["A1"] = "Date"
+    sheet["B1"] = "Open"
+    sheet["C1"] = "Close"
+    sheet["D1"] = "High"
+    sheet["E1"] = "Low"
+    counter = 2
+    for x in stockInfo.keys():
+        sheet["A" + str(counter)] = x
+        sheet["B" + str(counter)] = stockInfo[x]["1. open"]
+        sheet["C" + str(counter)] = stockInfo[x]["4. close"]
+        sheet["D" + str(counter)] = stockInfo[x]["2. high"]
+        sheet["E" + str(counter)] = stockInfo[x]["3. low"]
+        counter = counter + 1
+    workbook.save(filename=path)
+    workbook.close    
 
 def get_stock(STOCK_NAME, path):
     url = 'https://www.alphavantage.co/query?function=TIME_SERIES_' + TIME_TYPE.upper() + '&symbol=' + STOCK_NAME + '&apikey=' + API_KEY #Запрос данных об акицях.
     r = requests.get(url)
-    data = r.json()
+    data = r.json()[TIME_TYPE + " Time Series"]
     r.close()
 
     url1 = 'https://www.alphavantage.co/query?function=OVERVIEW&symbol=' + STOCK_NAME + '&apikey=' + API_KEY #Запрос данных о самой компании.
@@ -22,32 +41,23 @@ def get_stock(STOCK_NAME, path):
     data1 = r1.json()
     r1.close()
 
-    with open(path, 'w') as csvfile: #Запись в .csv файл
-        filewriter = csv.writer(csvfile, delimiter=';', dialect="excel", quoting=csv.QUOTE_ALL, lineterminator = '\n')
-        filewriter.writerow(['Date', 'Open', 'Close', "High", "Low", "Symbol"]) #Кириллицу не воспринимает, поэтому используем латиницу.
-        descriptorAdd = True
-        for x in data[TIME_TYPE + " Time Series"].keys():
-            info = data[TIME_TYPE + " Time Series"][x]
-            if descriptorAdd:
-                filewriter.writerow([x, info["1. open"], info["4. close"], info["2. high"], info["3. low"], data1["Symbol"]])
-                descriptorAdd = False
-            filewriter.writerow([x, info["1. open"], info["4. close"], info["2. high"], info["3. low"]])
-        csvfile.close()
+    write_toExcel(data, data1, path)    
 
-get_stock("TSLA", "TSLA.csv")
-get_stock("MSFT", "MSFT.csv") 
+
+
+get_stock("MSFT", "MSFT.xlsx") 
 time.sleep(70)
-get_stock("AAPL", "AAPL.csv")
-get_stock("WMT", "WMT.csv")
+get_stock("AAPL", "AAPL.xlsx")
+get_stock("WMT", "WMT.xlsx")
 time.sleep(70)
-get_stock("CVX", "CVX.csv")
-get_stock("TM", "TM.csv")
+get_stock("CVX", "CVX.xlsx")
+get_stock("TM", "TM.xlsx")
 time.sleep(70)
-get_stock("SEB", "SEB.csv")
-get_stock("JNJ", "JNJ.csv")
+get_stock("SEB", "SEB.xlsx")
+get_stock("INTC", "INTC.xlsx")
 time.sleep(70)
-get_stock("BABA", "BABA.csv")
-get_stock("CMG", "CMG.csv")
+get_stock("BABA", "BABA.xlsx")
+get_stock("AMZN", "AMZN.xlsx")
 time.sleep(70)
-get_stock("NKE", "NKE.csv")
-get_stock("V", "V.csv")
+get_stock("NKE", "NKE.xlsx")
+get_stock("NVDA", "NVDA.xlsx")
