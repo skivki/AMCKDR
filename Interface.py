@@ -48,7 +48,7 @@ photo = ImageTk.PhotoImage(image)
 image = canvas.create_image(200, 80,image=photo)
 # Создаем переменную n типа StringVar() и присваиваем ей пустое значение
 n = tk.StringVar()
-values=['NVIDIA','Microsoft','Apple','Walmart','Chevron','Toyota','Seabord','Intel','Alibaba','Chipotle','Nike']
+values=['NVIDIA','Microsoft','Apple','Walmart','Chevron','Toyota','Seabord','Intel','Alibaba','Nike']
 # Создаем объект класса Combobox со значениями values и присваиваем его переменной combo
 combo = Combobox(ws,width=35,height=8,font=("Arial bold", 14),values = values, textvariable = n )
 # Создаем объект класса Font со шрифтом Arial и размером 14 и присваиваем его переменной font
